@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details Form</title>
+    <link rel="stylesheet" href="style.css">
+    
+</head>
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+    <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="#">Inventory</a></li>
+        <li><a href="#">Add Item</a></li>
+        <li><a href="#">Contact</a></li>
+    </ul>
+</div>
+
+<!-- Form container -->
+<div class="form-container">
+    <h2>Add a new item to the inventory</h2>
+    <form action="http://localhost:3000/add-item" method="POST">
+        <div class="form-group">
+            <label for="category">Category:</label>
+            <select id="category" name="category" required>
+                <option value="" disabled selected>Select an item</option>
+                <option value="smartphone">Smartphone</option>
+                <option value="laptop">Laptop</option>
+                <option value="monitor">Monitor</option>
+                <option value="mouse">Mouse</option>
+                <option value="cpu">CPU</option>
+                <option value="printer">Printer</option>
+                <option value="tablet">Tablet</option>
+                <option value="keyboard">Keyboard</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="quantity">Item's Quantity:</label>
+            <input type="number" id="quantity" name="quantity" min="1" placeholder="Enter quantity here..." required>
+        </div>
+
+        <div class="form-group">
+            <label for="price">Price per day:</label>
+            <input type="number" id="price" name="price" min="100" placeholder="Enter price here..." required>
+        </div>
+
+        <div class="form-group">
+            <input type="submit" value="Add Item">
+        </div>
+    </form>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    <p>&copy; 2024 Inventory Management System</p>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

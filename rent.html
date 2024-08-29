@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rent an Item</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="navbar">
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="#">Inventory</a></li>
+            <li><a href="#">Add Item</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+    </div>    
+
+<div class="form-container">
+    <h2 style ="border: 1px solid rgb(13, 130, 154); border-radius: 5px;color: rgb(13, 130, 154);">Rent an Item</h2>
+    <form action="#" method="post">
+        <!-- Item Selection -->
+        <div class="form-group">
+            <label for="item-name">Select Item:</label>
+            <select id="item-name" name="item-name" required>
+                <option value="smartphone" selected>Smartphone</option>
+                <option value="laptop" selected>Laptop</option>
+                <option value="monitor" selected>Monitor</option>
+                <option value="headphone" selected>Headphone</option>
+                <option value="cpu" selected>CPU</option>
+                <option value="printer" selected>Printer</option>
+                <option value="tablet" selected>Tablet</option>
+                <option value="camera" selected>Camera</option>
+                <option value="" disabled selected>Select an item</option>
+                <!-- Add more items here -->
+            </select>
+        </div>
+        <!-- Rental Duration -->
+        <div class="form-group">
+            <label for="rental-duration">Rental Duration (days):</label>
+            <input type="number" id="rental-duration" name="rental-duration" min="1" required>
+        </div>
+        <!-- Item's Quantity -->
+        <div class="form-group">
+            <label for="quantity">Item's Quantity:</label>
+            <input type="number" id="quantity" name="quantity" min="1" required>
+        </div>
+        <!-- Start Date -->
+        <div class="form-group">
+            <label for="start-date">Start Date:</label>
+            <input type="date" id="start-date" name="start-date" required>
+        </div>
+
+        <!-- Renter's Name -->
+        <div class="form-group">
+            <label for="renter-name">Renter's Name:</label>
+            <input type="text" id="renter-name" name="renter-name" required>
+        </div>
+
+        <!-- Renter's Contact Information -->
+        <div class="form-group">
+            <label for="renter-contact">Renter's Contact Number:</label>
+            <input type="text" id="renter-contact" name="renter-contact" required>
+        </div>
+
+        <!-- Renter's Email -->
+        <div class="form-group">
+            <label for="renter-email" >Renter's Email:</label>
+            <input type="email" id="renter-email" name="renter-email" required style="width: 90%; padding: 4px; border: 1px solid #ccc; border-radius: 5px;">
+        </div>
+
+        <!-- Additional Notes -->
+        <!-- <div class="form-group">
+            <label for="additional-notes">Additional Notes (optional):</label>
+            <textarea id="additional-notes" name="additional-notes" rows="4" style="width: 70%; padding: 5px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
+        </div> -->
+
+        <!-- Submit Button -->
+        <div class="form-group">
+            <input type="submit" value="Submit">
+        </div>
+    </form>
+</div>
+<div class="footer">
+    <p>&copy; 2024 Inventory Management System</p>
+</div>
+</body>
+</html>
