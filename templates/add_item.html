@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,17 +12,17 @@
 <!-- Navbar -->
 <div class="navbar">
     <ul>
-        <li><a href="index.html">Home</a></li>
+        <li><a href="/">Home</a></li>
         <li><a href="#">Inventory</a></li>
-        <li><a href="#">Add Item</a></li>
-        <li><a href="#">Contact</a></li>
+        <li><a href="/add_item">Add Item</a></li>
+        <li><a href="/contact">Contact</a></li>
     </ul>
 </div>
 
 <!-- Form container -->
 <div class="form-container">
     <h2>Add a new item to the inventory</h2>
-    <form action="http://localhost:3000/add-item" method="POST">
+    <form action="http://localhost:3000/add_item" method="POST">
         <div class="form-group">
             <label for="category">Category:</label>
             <select id="category" name="category" required>
@@ -57,6 +57,6 @@
 <div class="footer">
     <p>&copy; 2024 Inventory Management System</p>
 </div>
-<script src="script.js"></script>
+<!-- <script src="script.js"></script> -->
 </body>
 </html>

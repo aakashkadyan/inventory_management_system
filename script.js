@@ -1,8 +1,82 @@
-// const express = require('express');
+const express = require('express');
+const path = require("path");
 // const mysql = require('mysql');
 // const bodyParser = require('body-parser');
+console.log("newpathhhh",__dirname)
+// const newpath = __dirname
 
-// const app = express();
+const app = express();
+// app.use(express.static(path.join(__dirname, 'static')));
+app.use(express.static('static'));
+
+app.get("/",(req,res)=>{
+  console.log("heyyyqqssss")
+  res.sendFile(path.join(__dirname,"templates","index.html"))
+})
+
+
+app.get("/add_item",(req,res)=>{
+  console.log("heyyy22211")
+  res.sendFile(path.join(__dirname,"templates","add_item.html"))
+
+})
+
+app.get("/rent",(req,res)=>{
+  console.log("heyyy22332")
+  res.sendFile(path.join(__dirname,"templates","rent.html"))
+})
+
+
+app.get("/return",(req,res)=>{
+  console.log("heyyy11111")
+  // const finalpath = newpath+"/return.html"
+  // res.sendFile(finalpath)
+  res.sendFile(path.join(__dirname,"templates","return.html"))
+
+})
+
+
+app.get("/overview",(req,res)=>{
+  console.log("heyyy22332")
+  res.sendFile(path.join(__dirname,"templates","overview.html"))
+
+})
+
+
+app.get("/contact",(req,res)=>{
+  console.log("contact")
+  res.sendFile(path.join(__dirname,"templates","contact.html"))
+
+})
+
+app.get("/customers",(req,res)=>{
+  console.log("customer")
+  res.sendFile(path.join(__dirname,"templates","customer.html"))
+
+
+})
+
+// function addItem(){
+//   window.location.href='/add_item'
+// }
+
+
+// function rentItem(){
+//   window.location.href="/rent"
+// }
+
+// function returnThings(){
+//   window.location.href="/return"
+// }
+
+// function overView(){
+//   window.location.href="/overview"
+// }
+
+
+
+
+
 // app.use(bodyParser.json());
 // app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -31,6 +105,9 @@
 //   });
 // });
 
-// app.listen(3000, () => {
-//   console.log('Server started on http://localhost:3000');
-// });
+
+
+
+app.listen(3000, () => {
+  console.log('Server started on http://localhost:3000');
+});
