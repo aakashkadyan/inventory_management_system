@@ -1,111 +1,157 @@
 const express = require('express');
 const path = require("path");
-// const mysql = require('mysql');
-// const bodyParser = require('body-parser');
-console.log("newpathhhh",__dirname)
-// const newpath = __dirname
-
+const mysql = require('mysql');
 const app = express();
-// app.use(express.static(path.join(__dirname, 'static')));
+const bodyParser = require('body-parser');
+
+app.use(bodyParser.json());
+
+app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(express.bodyParser());
+
+
+connection = mysql.createConnection({
+  host:"localhost",
+  user:"root",
+  password:"",
+  database:"inventory_database"
+})
+
+connection.connect()
+
+
+function InsertDataIntoInvetory(req,res,next){
+  data = req.body
+  console.log("hey",req.body)
+  query = `INSERT INTO inventory VALUES("1",'${data.category}','${data.quantity}','${data.price}');`
+  connection.query(query,(err,resp)=>{
+    if(err){
+      console.log("there is some issue in inserting data in inventory table",err)
+    }
+    else{
+      console.log("data inserted successfully in inventory")
+    }
+    next()
+  })
+
+
+
+}
+
+
+
+
+
+
+
+function DataBaseHandler(req,res,next){
+  console.log("yhaa aya")
+  // var query1 = `SELECT EXISTS( SELECT 1 FROM information_schema.tables WHERE table_schema = 'inventory_database' AND table_name = 'inventoryeeee');`
+  var query1 = `SELECT * FROM inventory;`
+  var query2 = `SELECT * FROM rent;`
+  connection.query(query1,(err,resp)=>{
+    if(err){
+      connection.query(`CREATE TABLE inventory(
+        Id INT NOT NULL PRIMARY KEY,
+        Device VARCHAR(255),
+        Quantity INT(5),
+        PricePerDay Double);`,(err,resp)=>{
+          if(err){
+            console.log("Error while creating")
+          }
+          else{
+            console.log("Inventory table created successfully")
+          }
+        })
+    }
+    else{
+      console.log("resppppp",resp)
+    }
+  connection.query(query2,(err,resp)=>{
+    if(err){
+      connection.query(`CREATE TABLE rent(
+        Id INT NOT NULL PRIMARY KEY,
+        RentedDate DATE NOT NULL,
+        ReturnDate DATE NOT NULL,
+        FOREIGN KEY(Id) REFERENCES inventory(Id),
+        TotalCharges DOUBLE,
+        RenterEmail VARCHAR(255),
+        RenterName VARCHAR(255),
+        Quantity INT(5) NOT NULL,
+        status ENUM("ACTIVE","INACTIVE") NOT NULL);`,(err,resp)=>{
+          if(err){
+            console.log("Error while creating rent table",err)
+          }
+          else{
+            console.log("rent table created successfully")
+          }
+        })
+      }
+  })
+
+    next()
+  })
+}
+
+
+
+
+
+
+
+
+const newpath = __dirname
 app.use(express.static('static'));
 
-app.get("/",(req,res)=>{
-  console.log("heyyyqqssss")
-  res.sendFile(path.join(__dirname,"templates","index.html"))
+app.get("/",DataBaseHandler,(req,res)=>{
+  res.sendFile(path.join(__dirname,"index.html"))
 })
 
 
 app.get("/add_item",(req,res)=>{
-  console.log("heyyy22211")
-  res.sendFile(path.join(__dirname,"templates","add_item.html"))
+  res.sendFile(path.join(__dirname,"add_item.html"))
 
 })
 
 app.get("/rent",(req,res)=>{
   console.log("heyyy22332")
-  res.sendFile(path.join(__dirname,"templates","rent.html"))
+  res.sendFile(path.join(__dirname,"rent.html"))
 })
 
 
 app.get("/return",(req,res)=>{
   console.log("heyyy11111")
-  // const finalpath = newpath+"/return.html"
-  // res.sendFile(finalpath)
-  res.sendFile(path.join(__dirname,"templates","return.html"))
+  res.sendFile(path.join(__dirname,"return.html"))
 
 })
 
 
 app.get("/overview",(req,res)=>{
-  console.log("heyyy22332")
-  res.sendFile(path.join(__dirname,"templates","overview.html"))
-
+  res.sendFile(path.join(__dirname,"overview.html"))
 })
 
 
 app.get("/contact",(req,res)=>{
-  console.log("contact")
-  res.sendFile(path.join(__dirname,"templates","contact.html"))
+  res.sendFile(path.join(__dirname,"contact.html"))
 
 })
 
 app.get("/customers",(req,res)=>{
-  console.log("customer")
-  res.sendFile(path.join(__dirname,"templates","customer.html"))
+  res.sendFile(path.join(__dirname,"customer.html"))
 
 
 })
 
-// function addItem(){
-//   window.location.href='/add_item'
-// }
 
+app.post("/productAdded",InsertDataIntoInvetory,(req,res)=>{
 
-// function rentItem(){
-//   window.location.href="/rent"
-// }
-
-// function returnThings(){
-//   window.location.href="/return"
-// }
-
-// function overView(){
-//   window.location.href="/overview"
-// }
-
-
-
-
-
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({ extended: true }));
-
-// const con = mysql.createConnection({
-//   host: "localhost",
-//   user: "yourusername",
-//   password: "yourpassword",
-//   database: "inventory_management"
-// });
-
-// con.connect(function(err) {
-//   if (err) throw err;
-//   console.log("Connected to the database!");
-// });
-
-// app.post('/addItem', (req, res) => {
-//   const { deviceName, quantity, pricePerDay } = req.body;
-
-//   const sql = "INSERT INTO inventory (deviceName, quantity, pricePerDay) VALUES (?, ?, ?)";
-//   con.query(sql, [deviceName, quantity, pricePerDay], function(err, result) {
-//     if (err) {
-//       res.status(500).send("Error inserting data");
-//       throw err;
-//     }
-//     res.send(`${result.affectedRows} record(s) inserted`);
-//   });
-// });
-
-
+  // for (const key in req.body) {
+  //   console.log(key, req.body[key]);
+  //   console.log("heyyyy") // Log key and value
+  // }
+  console.log(req.body,"my category data")
+  res.send("data got successfullly")
+})
 
 
 app.listen(3000, () => {
