@@ -22,5 +22,6 @@ Designed to enhance efficiency and accuracy, it ensures optimal management of la
 ![Screenshot from 2024-09-04 17-17-10](https://github.com/user-attachments/assets/c1d425f6-0254-4fc1-a657-960139d498dd)
 
 
+![Screenshot from 2024-09-04 17-48-24](https://github.com/user-attachments/assets/dd7fa1ab-b3b7-4911-95fb-586ff3fa2629)
 
 
