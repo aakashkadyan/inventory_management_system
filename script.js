@@ -25,11 +25,13 @@ connection.connect()
 
 function checkAndInsertData(req,res,next){
   try{
+    let dataFound;
       console.log("checkdataaaa",req.body)
       data = req.body
       query1 = `select * from inventory;`
       connection.query(query1,(err,resp)=>{
       if(!err){
+        console.log("yhaa ayaaa")
         for(let i = 0; i<resp.length;i++){
           if(data.name==resp[i]['DeviceName']){
             console.log("this iteam already exists",resp[i])
@@ -42,14 +44,16 @@ function checkAndInsertData(req,res,next){
               }
             else{
               console.log("value not inserted properly",err)
-
                 }
-                }
-              )
+              })
               }
+            else{
+              dataFound = true
             }
-          }    
-      else{
+            }
+          }
+              
+      if(dataFound){
         console.log("data is new")
         query = `INSERT INTO inventory(DeviceName,Quantity, PricePerDay) VALUES('${data.name}','${data.quantity}','${data.price}');`
         connection.query(query,(err,resp)=>{
@@ -58,10 +62,8 @@ function checkAndInsertData(req,res,next){
           }
           else{
             console.log("Data inserted successfully",resp)
-          }
-        }
-      )
-    }
+          }}
+      )}
     next()
     })
     }
