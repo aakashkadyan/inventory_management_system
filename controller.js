@@ -227,7 +227,6 @@ function checkAndInsertData(req,res,next){
 
 function rentingObject(req,res,next){
   console.log("heyyyyyyyylogggg",req.body)
-  let renting
 
   return 
 
