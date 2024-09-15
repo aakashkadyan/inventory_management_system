@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require("path");
 const mysql = require('mysql');
+const  { DataBaseHandler, checkAndInsertData, rentingObject} = require("./controller.js")
 const app = express();
 const bodyParser = require('body-parser');
 
@@ -23,63 +24,14 @@ connection.connect()
 
 
 
-function checkAndInsertData(req,res,next){
-  try{
-    let dataFound;
-      console.log("checkdataaaa",req.body)
-      data = req.body
-      query1 = `select * from inventory;`
-      connection.query(query1,(err,resp)=>{
-      if(!err){
-        console.log("yhaa ayaaa")
-        for(let i = 0; i<resp.length;i++){
-          if(data.name==resp[i]['DeviceName']){
-            console.log("this iteam already exists",resp[i])
-            newquantity = parseInt(resp[i]['Quantity'])+parseInt(data.quantity)
-            console.log("newwwwquantity",newquantity)
-            updatequery = `UPDATE inventory SET Quantity=${newquantity},PricePerDay=${data.price} WHERE DeviceName="${data.name}";`
-            connection.query(updatequery,(err,resp)=>{
-            if(!err){
-              console.log("new values for the existing data is updated",resp)
-              }
-            else{
-              console.log("value not inserted properly",err)
-                }
-              })
-              }
-            else{
-              dataFound = true
-            }
-            }
-          }
-              
-      if(dataFound){
-        console.log("data is new")
-        query = `INSERT INTO inventory(DeviceName,Quantity, PricePerDay) VALUES('${data.name}','${data.quantity}','${data.price}');`
-        connection.query(query,(err,resp)=>{
-          if(err){
-            console.log("there is some issue in inserting data in inventory table",err)
-          }
-          else{
-            console.log("Data inserted successfully",resp)
-          }}
-      )}
-    next()
-    })
-    }
-  catch(err){
-    console.log(err.lineNumber,"ccc");
-  }
 
-
-}
   
 
 
 
 function InsertDataIntoInvetory(req,res,next){
   data = req.body
-  console.log("hey",req.body)
+  console.log("heyyyyyyy",req.body)
   query = `INSERT INTO inventory(DeviceName , Quantity, PricePerDay) VALUES('${data.name}','${data.quantity}','${data.price}');`
   connection.query(query,(err,resp)=>{
     if(err){
@@ -101,57 +53,6 @@ function InsertDataIntoInvetory(req,res,next){
 
 
 
-function DataBaseHandler(req,res,next){
-  console.log("yhaa aya")
-  // var query1 = `SELECT EXISTS( SELECT 1 FROM information_schema.tables WHERE table_schema = 'inventory_database' AND table_name = 'inventoryeeee');`
-  var query1 = `SELECT * FROM inventory;`
-  var query2 = `SELECT * FROM rent;`
-  connection.query(query1,(err,resp)=>{
-    if(err){
-      connection.query(`CREATE TABLE inventory(
-        Id INT AUTO_INCREMENT PRIMARY KEY ,
-        DeviceName VARCHAR(255) UNIQUE,
-        Quantity INT(5),
-        PricePerDay Double);`,(err,resp)=>{
-          if(err){
-            console.log("Error while creating")
-          }
-          else{
-            console.log("Inventory table created successfully")
-          }
-        })
-    }
-    else{
-      console.log("Inventory table already exists")
-    }
-  connection.query(query2,(err,resp)=>{
-    if(err){
-      connection.query(`CREATE TABLE rent(
-        Id INT NOT NULL PRIMARY KEY,
-        RentedDate DATE NOT NULL,
-        ReturnDate DATE NOT NULL,
-        FOREIGN KEY(Id) REFERENCES inventory(Id),
-        TotalCharges DOUBLE,
-        RenterEmail VARCHAR(255),
-        RenterName VARCHAR(255),
-        Quantity INT(5) NOT NULL,
-        status ENUM("ACTIVE","INACTIVE") NOT NULL);`,(err,resp)=>{
-          if(err){
-            console.log("Error while creating rent table",err)
-          }
-          else{
-            console.log("rent table created successfully")
-          }
-        })
-      }
-      else{
-        console.log("rent table already exists")
-      }
-  })
-
-    next()
-  })
-}
 
 
 
@@ -172,6 +73,9 @@ app.get("/add_item",(req,res)=>{
   res.sendFile(path.join(__dirname,"add_item.html"))
 
 })
+
+
+
 
 app.get("/rent",(req,res)=>{
   console.log("heyyy22332")
@@ -213,6 +117,15 @@ app.post("/add_product",checkAndInsertData,(req,res)=>{
   console.log(req.body,"my category data")
   res.send("data got successfullly")
 })
+
+
+app.post("/rent_item",rentingObject,(req,res)=>{
+  console.log("rent wala data",req.body)
+  res.send("apka rent data mil gya")
+})
+
+
+
 
 
 app.listen(3000, () => {
