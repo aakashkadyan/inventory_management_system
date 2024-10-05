@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require("path");
 const mysql = require('mysql');
-const  { DataBaseHandler, checkAndInsertData, rentingObject} = require("./controller.js")
+const  { DataBaseHandler, checkAndInsertData, rentingObject, inventoryItemCheck} = require("./controllernew.js")
 const app = express();
 const bodyParser = require('body-parser');
 
@@ -29,23 +29,23 @@ connection.connect()
 
 
 
-function InsertDataIntoInvetory(req,res,next){
-  data = req.body
-  console.log("heyyyyyyy",req.body)
-  query = `INSERT INTO inventory(DeviceName , Quantity, PricePerDay) VALUES('${data.name}','${data.quantity}','${data.price}');`
-  connection.query(query,(err,resp)=>{
-    if(err){
-      console.log("there is some issue in inserting data in inventory table",err)
-    }
-    else{
-      console.log("data inserted successfully in inventory")
-    }
-    next()
-  })
+// function InsertDataIntoInvetory(req,res,next){
+//   data = req.body
+//   console.log("heyyyyyyy",req.body)
+//   query = `INSERT INTO inventory(DeviceName , Quantity, PricePerDay) VALUES('${data.name}','${data.quantity}','${data.price}');`
+//   connection.query(query,(err,resp)=>{
+//     if(err){
+//       console.log("there is some issue in inserting data in inventory table",err)
+//     }
+//     else{
+//       console.log("data inserted successfully in inventory")
+//     }
+//     next()
+//   })
 
 
 
-}
+// }
 
 
 
@@ -78,7 +78,8 @@ app.get("/add_item",(req,res)=>{
 
 
 app.get("/rent",(req,res)=>{
-  console.log("heyyy22332")
+  let date = new Date().toISOString().split('T')[0]
+  console.log("heyyy22332",date)
   res.sendFile(path.join(__dirname,"rent.html"))
 })
 
@@ -120,12 +121,18 @@ app.post("/add_product",checkAndInsertData,(req,res)=>{
 
 
 app.post("/rent_item",rentingObject,(req,res)=>{
+
   console.log("rent wala data",req.body)
   res.send("apka rent data mil gya")
 })
 
 
 
+app.post("/rent_data",inventoryItemCheck,(req,res)=>{
+   console.log("data i got",req.body.name)
+   console.log("data i got from inventory db",req.datagot)
+   res.send(req.datagot)
+})
 
 
 app.listen(3000, () => {

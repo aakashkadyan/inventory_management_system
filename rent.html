@@ -22,17 +22,8 @@
         <!-- Item Selection -->
         <div class="form-group">
             <label for="item-name">Select Item:</label>
-            <select id="item-name" name="item-name" required>
-                <option value="smartphone" selected>Smartphone</option>
-                <option value="laptop" selected>Laptop</option>
-                <option value="monitor" selected>Monitor</option>
-                <option value="headphone" selected>Headphone</option>
-                <option value="cpu" selected>CPU</option>
-                <option value="printer" selected>Printer</option>
-                <option value="tablet" selected>Tablet</option>
-                <option value="camera" selected>Camera</option>
-                <option value="" disabled selected>Select an item</option>
-                <!-- Add more items here -->
+            <select id="item-name" name="item-name" required onchange="showingPrice()">
+
             </select>
         </div>
         <!-- Rental Duration -->
@@ -45,6 +36,11 @@
             <label for="quantity">Item's Quantity:</label>
             <input type="number" id="quantity" name="quantity" min="1" required>
         </div>
+        <div class="form-group">
+            <label for="price">Price Per Day</label>
+            <input type="number" id="PriceEachDay" name="price" min="1" required readonly>
+        </div>
+
         <!-- Start Date -->
         <div class="form-group">
             <label for="start-date">Start Date:</label>
@@ -85,4 +81,44 @@
     <p>&copy; 2024 Inventory Management System</p>
 </div>
 </body>
+<script>
+    fetch('/rent_data', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                body : JSON.stringify({ name : "dekh to le" })  
+            })
+            .then(response=>response.json())
+            .then(resultdata=>{
+                let element = document.getElementById("item-name")
+                for(let i=0;i<resultdata.length;i++){
+                    let optionElement = document.createElement("OPTION")
+                    console.log("data",resultdata[i])
+                    optionElement.setAttribute("value",resultdata[i].DeviceName)
+                    optionElement.setAttribute("data-price",resultdata[i].PricePerDay)
+                    // optionElement.setAttribute("selected","")
+                    // optionElement.setAttribute("selected","")
+                    optionElement.innerHTML = resultdata[i].DeviceName
+                    
+                    console.log("html side pr",optionElement)
+                    // element.innerHTML = resultdata[i];
+                    element.appendChild(optionElement)
+
+                }
+
+
+
+            // document.body.appendChild(element)
+    })
+
+    function showingPrice(){
+        let DisplayBox = document.getElementById("PriceEachDay")
+        let getItem = document.getElementById("item-name")
+        // console.log("getItem",getItem[getItem.selectedIndex].getAttribute('data-price'))
+        DisplayBox.value = getItem[getItem.selectedIndex].getAttribute('data-price')
+        
+    }
+    window.onload = showingPrice;
+</script>
 </html>

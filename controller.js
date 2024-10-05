@@ -55,7 +55,8 @@ function checkAndInsertData(req,res,next){
   query1 = `select * from inventory where DeviceName = "${data.name}";`
   let searchDataPromise = new Promise((resolve,reject)=>{
     connection.query(query1,(dberr,dbresp)=>{
-    console.log("resss",dbresp)
+    console.log("resss",dbresp.length)
+    console.log("dberr",dberr)
       if(dbresp.length>0){
         return resolve(dbresp)
         }
@@ -68,47 +69,53 @@ function checkAndInsertData(req,res,next){
     console.log("here then",dbresp[0]['Quantity'])
       let insertIntoInventory = new Promise((resolve,reject)=>{
         let newquantity = parseInt(dbresp[0]['Quantity'])+parseInt(data.quantity);
-        updatequery = `UPDATE inventory SET Quantity=${newquantity},PricePerDay=${data.price} WHERE DeviceName="${data.name}";`
+        updatequery = `UPDATE inventory SET Quantity=${newquantity}, PricePerDay=${data.price} WHERE DeviceName="${data.name}";`
         connection.query(updatequery,(err,resp)=>{
+        // console.log("resp",resp.length)
         console.log("errrr",err)
-          if(err){
-            return reject(err)
-          }
-          else{
-            return resolve(resp)
-          }
+            if(err){
+                return reject(`An Error Occured while updating inventorytable ${err}`)
+            }
+            // else if(resp.length>0){
+            //     return resolve(resp)
+            // }
+            else{
+                return resolve(`invetory data updated successfully`);
+            }
         })
       })
-      insertIntoInventory.then((resp)=>{
-        console.log("data updated successfully",resp)
-        console.log(resp)
+      return insertIntoInventory
+    }).then((resp)=>{
+        console.log("data updated successfully")
+        // console.log(resp)    
       })
-      insertIntoInventory.catch((err)=>{
+      .catch((err)=>{
         console.log("Error while inserting data",err)
       })
-  })
-  searchDataPromise.catch((myerr)=>{
+
+    searchDataPromise.catch((myerr)=>{
     console.log("errrrr",myerr)
     let insertPromise = new Promise((resolve,reject)=>{
       console.log("heyyyyyy")
       let insertQuery = `INSERT INTO inventory(DeviceName, Quantity, PricePerDay) VALUES('${data.name}','${data.quantity}','${data.price}');`
       connection.query(insertQuery,(dberr,dbresp)=>{
         console.log("yee ayya",dberr)
+        console.log("yee ayya dbrespdbresp",dbresp)
         if(dberr){
           console.log("Error while inserting data in inventory table")
-          return reject(dberr)
+          return reject(`Error while inserting data in inventory table ${dberr}`)
         }
         else{
           console.log(`data is inserted successfully in inventory table`)
-          return resolve(dbresp)
+          return resolve(`data is inserted successfully in inventory table ${dbresp}`)
         }
       })
     })
     insertPromise.then((dbresp)=>{
-      console("data inserted successfully",dbresp)
+      console.log("data inserted successfully",dbresp)
     })
     insertPromise.catch((dberr)=>{
-      console("data didn't inserted successfully",dberr)
+      console.log("data didn't inserted successfully",dberr)
     })
   })
   next()
@@ -179,7 +186,7 @@ function checkAndInsertData(req,res,next){
     connection.query(inventoryQuery,(err,resp)=>{
       if(err){
         connection.query(`CREATE TABLE inventory(
-          Id INT AUTO_INCREMENT PRIMARY KEY ,
+          object_Id INT AUTO_INCREMENT PRIMARY KEY ,
           DeviceName VARCHAR(255) UNIQUE,
           Quantity INT(5),
           PricePerDay Double);`,(err,resp)=>{
@@ -197,10 +204,10 @@ function checkAndInsertData(req,res,next){
       connection.query(rentQuery,(err,resp)=>{
         if(err){
           connection.query(`CREATE TABLE rent(
-            Id INT NOT NULL PRIMARY KEY,
+            Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
             RentedDate DATE NOT NULL,
-            ReturnDate DATE NOT NULL,
-            FOREIGN KEY(Id) REFERENCES inventory(Id),
+            object_Id Int,
+            FOREIGN KEY(object_Id) REFERENCES inventory(object_Id),
             TotalCharges DOUBLE,
             RenterEmail VARCHAR(255),
             RenterName VARCHAR(255),
@@ -218,24 +225,106 @@ function checkAndInsertData(req,res,next){
           console.log("rent table already exists")
         }
       })  
-      next()
     })
+    next()
   }
   
 
 
 
+// RENT WALA DATA
+
 function rentingObject(req,res,next){
-  console.log("heyyyyyyyylogggg",req.body)
+  let data = req.body
+  // console.log("heyyyyyyyylogggg",req.body);
+  console.log("itemnameeeeeee",data.item_name);
+  let checkPromise = new Promise((resolve,reject)=>{
+    let checkDbQuery = `SELECT * FROM inventory WHERE DeviceName = "${data.item_name}";`
+    connection.query(checkDbQuery,(dberr,dbresp)=>{
+      if(dberr){
+        console.log("thingssss",dberr)
+        return reject(`didn't able to find from inventory table ${dberr}`)
+      }
+      else{
+        console.log("dbrespdbresp",dbresp)
+        return resolve(`got the data from inventory table ${dbresp}`)
+      }
+    })
+  })
+  checkPromise.then((dbresp)=>{
+    console.log("quantity in db",dbresp[0].Quantity)
+    console.log("form in quantity",parseInt(data.quantity))
+    if(parseInt(data.quantity)<=dbresp[0].Quantity){
+      let updatedInventoryQuantity = dbresp[0].Quantity-parseInt(data.quantity)
+      console.log("DB Data is more than require data",dbresp[0].Quantity-parseInt(data.quantity))
+      let date = new Date().toISOString().split('T')[0]
 
-  return 
-
+      let rentEntryQuery = `INSERT INTO rent(RentedDate, ReturnDate, object_Id ,TotalCharges ,RenterEmail ,RenterName ,Quantity ,status ) VALUES('${date}, ',)`
+    }
+    else{
+      console.log("Insufficient Data")
+      
+    }
+  })
+  checkPromise.catch((dberr)=>{
+    console.log("No such iteam in our db",dberr)
+  })
+  next()
 }
+
+
+function inventoryItemCheck(req,res,next){
+  // let inventoryDataObject = {}
+  let deviceName = []
+  let prices = []
+  let itemspromise = new Promise((resolve,reject)=>{
+    let checkInventor = `SELECT * FROM inventory`;
+    connection.query(checkInventor,(dberr,dbresp)=>{
+      console.log("yhaaaa",dberr)
+      console.log("yhaaaa2",dbresp)
+      if(dberr==null){
+        dbresp.forEach(element => {
+          console.log("elements",element)
+          
+        });
+        // for(let i=0;i<dbresp.length;i++){
+        //   console.log("idharrr2",dbresp[i].DeviceName)
+        // }
+        
+
+        if(dbresp.length==0){
+          console.log("nhi mila data")
+          return resolve("There is no data")
+        }
+        else{
+          console.log("mil gya he data",dbresp)
+          return resolve(dbresp)
+        }
+      }
+      else{
+        console.log("idhaar kya")
+        return reject(dbresp)
+      }
+    });
+  });
+  itemspromise.then((dbresp)=>{
+    req.datagot = dbresp;
+  })
+  itemspromise.catch((dberr)=>{
+    req.datagot = dberr;
+  })
+  itemspromise.finally(()=>{
+    // req.datagot = dbresp
+    next();
+  });
+
+};
 
 
 
   module.exports = {
     DataBaseHandler,
     checkAndInsertData,
+    inventoryItemCheck,
     rentingObject
   }

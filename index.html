@@ -19,10 +19,11 @@
                 <li><a href="#help" onclick="alert('This page is under construction!!')">Help & Support</a></li>
                 
             </ul></nav>
-        <main class="main">
+        <main class="main" id="hello">
             <section class="inventory-list">
                 <button class="box admin" onclick=addItem()>Add an Item</button>
                 <button class="box rent" onclick=rentItem()>Rent</button>
+                <button class="box rent" onclick=NewRent()>NewRent</button>
                 <button class="box return" onclick=returnThings()>Return</button>
                 <button class="box overview" onclick=overView()>Overview</button>
             </section>
@@ -46,5 +47,26 @@
         function overView(){
             window.location.href="/overview"
         }
+
+        function NewRent(){
+            console.log("ye dekh")
+            console.log("Dekh bhai data aya")
+            fetch('/submit', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                body : JSON.stringify({ name : "dekh to le" })
+                
+            })
+            .then(response=>response.text())
+            .then(resultdata=>{
+            let element = document.getElementById("hello")
+            element.innerHTML = resultdata;
+            document.body.appendChild(element)
+            })
+        }
+            
+
 </script>
 </html>
