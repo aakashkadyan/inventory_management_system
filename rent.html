@@ -22,11 +22,20 @@
         <!-- Item Selection -->
         <div class="form-group">
             <label for="item-name">Select Item:</label>
-            <select id="item-name" name="item-name" required onchange="showingPrice()">
-
-            </select>
+            <select id="item-name" name="item-name" required onchange="showingPriceAndTotalQuantity()"></select>
         </div>
         <!-- Rental Duration -->
+
+        <div class="form-group">
+            <label for="price">Total Item Quantity</label>
+            <input type="number" id="TotalQuantity" name="Quantity" min="1" required readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="price">Price Per Day</label>
+            <input type="number" id="PriceEachDay" name="price" min="1" required readonly>
+        </div>
+
         <div class="form-group">
             <label for="rental-duration">Rental Duration (days):</label>
             <input type="number" id="rental-duration" name="rental-duration" min="1" required>
@@ -36,10 +45,8 @@
             <label for="quantity">Item's Quantity:</label>
             <input type="number" id="quantity" name="quantity" min="1" required>
         </div>
-        <div class="form-group">
-            <label for="price">Price Per Day</label>
-            <input type="number" id="PriceEachDay" name="price" min="1" required readonly>
-        </div>
+       
+        
 
         <!-- Start Date -->
         <div class="form-group">
@@ -97,6 +104,7 @@
                     console.log("data",resultdata[i])
                     optionElement.setAttribute("value",resultdata[i].DeviceName)
                     optionElement.setAttribute("data-price",resultdata[i].PricePerDay)
+                    optionElement.setAttribute("Quantity",resultdata[i].Quantity)
                     // optionElement.setAttribute("selected","")
                     // optionElement.setAttribute("selected","")
                     optionElement.innerHTML = resultdata[i].DeviceName
@@ -112,13 +120,15 @@
             // document.body.appendChild(element)
     })
 
-    function showingPrice(){
+    function showingPriceAndTotalQuantity(){
         let DisplayBox = document.getElementById("PriceEachDay")
+        let QuantityBox = document.getElementById("TotalQuantity")
         let getItem = document.getElementById("item-name")
+        console.log("getItem",getItem)
         // console.log("getItem",getItem[getItem.selectedIndex].getAttribute('data-price'))
         DisplayBox.value = getItem[getItem.selectedIndex].getAttribute('data-price')
-        
+        QuantityBox.value = getItem[getItem.selectedIndex].getAttribute('Quantity')       
     }
-    window.onload = showingPrice;
+    // window.onload = showingPrice;
 </script>
 </html>
