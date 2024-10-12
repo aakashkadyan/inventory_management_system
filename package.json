@@ -1,0 +1,29 @@
+{
+  "name": "inventory_management_system",
+  "version": "1.0.0",
+  "description": "This system effectively monitors and manages inventory for a computer lab, including hard disks, mice, keyboards, laptops, and monitors.  It offers real-time tracking of equipment and stock levels.  Additionally, the system includes a rental management feature for easy tracking of borrowed items.  Designed to enhance efficiency and accuracy, it ensures optimal management of lab resources.",
+  "main": "script.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node script.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aakashkadyan/inventory_management_system.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aakashkadyan/inventory_management_system/issues"
+  },
+  "homepage": "https://github.com/aakashkadyan/inventory_management_system#readme",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.11.3"
+  }
+}
