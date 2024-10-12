@@ -1,9 +1,11 @@
 const express = require('express');
 const path = require("path");
-const mysql = require('mysql');
+const mysql = require('mysql2');
 const  { DataBaseHandler, checkAndInsertData, rentingObject, inventoryItemCheck} = require("./controllernew.js")
 const app = express();
 const bodyParser = require('body-parser');
+
+require('dotenv').config();
 
 app.use(bodyParser.json());
 
@@ -13,8 +15,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 connection = mysql.createConnection({
   host:"localhost",
-  user:"root",
-  password:"",
+  user: process.env.MYSQL_USERNAME,
+  password: process.env.MYSQL_PASSWORD,
   database:"inventory_database"
 })
 
