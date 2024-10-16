@@ -1,7 +1,8 @@
 const express = require('express');
 const path = require("path");
 const mysql = require('mysql');
-const  { DataBaseHandler, checkAndInsertData, rentingObject, inventoryItemCheck} = require("./controllernew.js")
+const  {checkAndInsertData, rentingObject, inventoryItemCheck} = require("./controllernew.js")
+const {initDb} = require("./lib/db.js")
 const app = express();
 const bodyParser = require('body-parser');
 
@@ -10,15 +11,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(express.bodyParser());
 
+initDb()
 
-connection = mysql.createConnection({
-  host:"localhost",
-  user:"root",
-  password:"",
-  database:"inventory_database"
-})
-
-connection.connect()
+// connection.connect()
 
 
 
@@ -64,14 +59,14 @@ connection.connect()
 const newpath = __dirname
 app.use(express.static('static'));
 
-app.get("/",DataBaseHandler,(req,res)=>{
+// app.get("/",DataBaseHandler,(req,res)=>{
+app.get("/",(req,res)=>{
   res.sendFile(path.join(__dirname,"index.html"))
 })
 
 
 app.get("/add_item",(req,res)=>{
   res.sendFile(path.join(__dirname,"add_item.html"))
-
 })
 
 
