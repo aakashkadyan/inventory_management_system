@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rent an Item</title>
     <link rel="stylesheet" href="style.css">
+
+   
 </head>
 <body>
     <div class="navbar">
@@ -43,7 +45,7 @@
         <!-- Item's Quantity -->
         <div class="form-group">
             <label for="quantity">Item's Quantity:</label>
-            <input type="number" id="quantity" name="quantity" min="1" required>
+            <input type="text" id="quantity" name="quantity" min="1" required oninput="checkAvailabilty()">
         </div>
        
         
@@ -63,7 +65,7 @@
         <!-- Renter's Contact Information -->
         <div class="form-group">
             <label for="renter-contact">Renter's Contact Number:</label>
-            <input type="text" id="renter-contact" name="renter-contact" required>
+            <input type="number" id="renter-contact" name="renter-contact" required>
         </div>
 
         <!-- Renter's Email -->
@@ -130,5 +132,11 @@
         QuantityBox.value = getItem[getItem.selectedIndex].getAttribute('Quantity')       
     }
     // window.onload = showingPrice;
+    
+    function checkAvailabilty(){
+        let data = document.getElementById("quantity").value
+        console.log("datttttaaa",data)
+    }
+   
 </script>
 </html>

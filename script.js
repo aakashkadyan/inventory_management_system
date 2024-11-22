@@ -48,56 +48,48 @@ initDb()
 
 
 
-
-
-
-
-
-
-
-
-const newpath = __dirname
+const newpath = __dirname+"/static/"
 app.use(express.static('static'));
 
-// app.get("/",DataBaseHandler,(req,res)=>{
 app.get("/",(req,res)=>{
-  res.sendFile(path.join(__dirname,"index.html"))
+  console.log("__dirname",__dirname)
+  res.sendFile(path.join(newpath,"index.html"))
 })
 
 
 app.get("/add_item",(req,res)=>{
-  res.sendFile(path.join(__dirname,"add_item.html"))
+  console.log("__dirname",__dirname)
+  res.sendFile(path.join(newpath,"add_item.html"))
 })
 
 
 
 
 app.get("/rent",(req,res)=>{
-  let date = new Date().toISOString().split('T')[0]
-  console.log("heyyy22332",date)
-  res.sendFile(path.join(__dirname,"rent.html"))
+  console.log("heyyy22332")
+  res.sendFile(path.join(newpath,"rent.html"))
 })
 
 
 app.get("/return",(req,res)=>{
   console.log("heyyy11111")
-  res.sendFile(path.join(__dirname,"return.html"))
+  res.sendFile(path.join(newpath,"return.html"))
 
 })
 
 
 app.get("/overview",(req,res)=>{
-  res.sendFile(path.join(__dirname,"overview.html"))
+  res.sendFile(path.join(newpath,"overview.html"))
 })
 
 
 app.get("/contact",(req,res)=>{
-  res.sendFile(path.join(__dirname,"contact.html"))
+  res.sendFile(path.join(newpath,"contact.html"))
 
 })
 
 app.get("/customers",(req,res)=>{
-  res.sendFile(path.join(__dirname,"customer.html"))
+  res.sendFile(path.join(newpath,"customer.html"))
 
 
 })
@@ -105,11 +97,6 @@ app.get("/customers",(req,res)=>{
 
 // app.post("/add_product",InsertDataIntoInvetory,(req,res)=>{
 app.post("/add_product",checkAndInsertData,(req,res)=>{
-
-  // for (const key in req.body) {
-  //   console.log(key, req.body[key]);
-  //   console.log("heyyyy") // Log key and value
-  // }
   console.log(req.body,"my category data")
   res.send("data got successfullly")
 })
