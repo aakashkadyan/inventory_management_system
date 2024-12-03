@@ -1,8 +1,8 @@
 const express = require('express');
 const path = require("path");
 const mysql = require('mysql');
-const  {checkAndInsertData, rentingObject, inventoryItemCheck} = require("./controllernew.js")
-const {initDb} = require("./lib/db.js")
+const  {inventoryItemCheck,rentingObject} = require("./controller/controllernew.js")
+const {initDb,upsertData} = require("./lib/db.js")
 const app = express();
 const bodyParser = require('body-parser');
 
@@ -56,17 +56,18 @@ initDb()
 
 
 
-const newpath = __dirname
+const newpath = __dirname+"/templates/"
+console.log("newwwwwww",newpath)
 app.use(express.static('static'));
 
 // app.get("/",DataBaseHandler,(req,res)=>{
 app.get("/",(req,res)=>{
-  res.sendFile(path.join(__dirname,"index.html"))
+  res.sendFile(path.join(newpath,"index.html"))
 })
 
 
 app.get("/add_item",(req,res)=>{
-  res.sendFile(path.join(__dirname,"add_item.html"))
+  res.sendFile(path.join(newpath,"add_item.html"))
 })
 
 
@@ -75,36 +76,36 @@ app.get("/add_item",(req,res)=>{
 app.get("/rent",(req,res)=>{
   let date = new Date().toISOString().split('T')[0]
   console.log("heyyy22332",date)
-  res.sendFile(path.join(__dirname,"rent.html"))
+  res.sendFile(path.join(newpath,"rent.html"))
 })
 
 
 app.get("/return",(req,res)=>{
   console.log("heyyy11111")
-  res.sendFile(path.join(__dirname,"return.html"))
+  res.sendFile(path.join(newpath,"return.html"))
 
 })
 
 
 app.get("/overview",(req,res)=>{
-  res.sendFile(path.join(__dirname,"overview.html"))
+  res.sendFile(path.join(newpath,"overview.html"))
 })
 
 
 app.get("/contact",(req,res)=>{
-  res.sendFile(path.join(__dirname,"contact.html"))
+  res.sendFile(path.join(newpath,"contact.html"))
 
 })
 
 app.get("/customers",(req,res)=>{
-  res.sendFile(path.join(__dirname,"customer.html"))
+  res.sendFile(path.join(newpath,"customer.html"))
 
 
 })
 
 
 // app.post("/add_product",InsertDataIntoInvetory,(req,res)=>{
-app.post("/add_product",checkAndInsertData,(req,res)=>{
+app.post("/add_product",upsertData,(req,res)=>{
 
   // for (const key in req.body) {
   //   console.log(key, req.body[key]);
@@ -116,17 +117,15 @@ app.post("/add_product",checkAndInsertData,(req,res)=>{
 
 
 app.post("/rent_item",rentingObject,(req,res)=>{
-
-  console.log("rent wala data",req.body)
-  res.send("apka rent data mil gya")
 })
 
 
 
-app.post("/rent_data",inventoryItemCheck,(req,res)=>{
-   console.log("data i got",req.body.name)
-   console.log("data i got from inventory db",req.datagot)
-   res.send(req.datagot)
+app.post("/inventoryItemForRent",inventoryItemCheck,(req,res)=>{
+   console.log("data i got",req.body.status)
+   console.log("yee deh",res.newfinalData)
+   res.send(res.newfinalData)
+
 })
 
 

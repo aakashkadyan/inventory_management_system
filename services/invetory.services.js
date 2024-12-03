@@ -1,6 +1,6 @@
 // here we will create function which perform db related tasks like insert update and so on. 
 
-const {connection} = require('../lib/db')
+const {connection,inventoryDataWithName} = require('../lib/db.js')
 
 function upsertInventory(req,res,next){
     const {name,quantity,price} = req.body
@@ -63,44 +63,130 @@ function upsertInventory(req,res,next){
 
 
 
-function checkItemAvaliabitlty(req,res,next){
+function itemInInventory(){
     console.log("checkkkkkkkAVVVVVV")
     let deviceName = []
     let prices = []
-    let itemspromise = new Promise((resolve,reject)=>{
-      let checkInventor = `SELECT * FROM inventory`;
-      connection.query(checkInventor,(dberr,dbresp)=>{
-        if(dberr==null){
+    let totalquantity = []
+    let finalData = {}
+    let everyThingFromInventory = `SELECT * FROM inventory;`
+    return new Promise((resolve,reject)=>{
+      connection.query(everyThingFromInventory,(dberr,dbresp)=>{
+        if(!dberr){
           dbresp.forEach(element => {
-            console.log("elements",element) 
+            deviceName.push(element.DeviceName)
+            prices.push(element.PricePerDay)
+            totalquantity.push(element.Quantity)
           });
-
-          if(dbresp.length==0){
-            console.log("nhi mila data")
-            return resolve("There is no data")
-          }
-          else{
-            console.log("mil gya he data",dbresp)
-            return resolve(dbresp)
-          }
         }
         else{
-          console.log("idhaar kya")
-          return reject(dbresp)
+          console.log("kuch nhi",dbresp)
         }
+      finalData['prices']=prices
+      finalData['deviceName']=deviceName
+      finalData['totalQuantity']=totalquantity
+      resolve(finalData)
       });
     });
-    itemspromise.then((dbresp)=>{
-      req.datagot = dbresp;
-    })
-    itemspromise.catch((dberr)=>{
-      req.datagot = dberr;
-    })
-    itemspromise.finally(()=>{
-      // req.datagot = dbresp
-      next();
-    });
-  };
+  }
+
+
+
+
+
+
+
+
+async function upsertInventoryByName(itemName,requestedQuantity){
+    console.log("yhaa tk ayaa",itemName)
+    console.log("updatingQuantity",typeof(requestedQuantity))
+    // let finalData = await connection.query(searchQuary,(dberr,dbresp)=>{
+    //   if(dberr){
+    //     console.log("dberrdberr",dberr)
+    //   }
+    //   console.log("inventoryMe ye data mila he",dbresp)
+    //   let newquantity = Number(requestedQuantity)-Number(dbresp['Quantity'])
+    // })
+    try {
+      let dbresp = await inventoryDataWithName(itemName)
+      console.log("YEEE DEKHHH",dbresp)
+      console.log("inventoryMe ye data mila he", dbresp[0].Quantity);
+      let updatedInventoryQuantity = Number(dbresp[0].Quantity)-Number(requestedQuantity)
+      console.log("updatedInventoryQuantityupdatedInventoryQuantity",updatedInventoryQuantity)
+      let insertUpdatedQuantity = `UPDATE inventory SET Quantity = ${updatedInventoryQuantity} WHERE DeviceName = "${itemName}"; `
+      let upsertStatus = await new Promise((resolve,reject)=>{
+        connection.query(insertUpdatedQuantity,(dberr,dbres)=>{
+          if (dberr){
+            console.log("dberrrrrr",dberr)
+            reject(dberr)
+          }
+          else{
+            console.log("dbressppp",dbres)
+            resolve(dbres)
+          }
+        })
+
+      })
+      
+      console.log("final data",updatedInventoryQuantity)
+      console.log("upsertStatus upsertStatus",upsertStatus)
+      let dataForFrontend = {"status":upsertStatus,
+        "data":"Inventory Updated",
+        objectId : dbresp[0]['object_Id']
+      }
+      return dataForFrontend
+    }catch(err){
+      console.log("Error",err)
+    }
+}
+
+
+
+async function insertIntoRentDb(rentStartDate,rentedId,totalBill,renterEmail,renterName,requestedQuantity,status="Active"){
+  let insertQuery = `INSERT INTO rent(RentedDate,object_Id,TotalCharges,RenterEmail,RenterName,Quantity,status) VALUES("${rentStartDate}",${rentedId},${totalBill},"${renterEmail}","${renterName}",${requestedQuantity},"${status}");`
+  console.log("Insert Query for rent db",insertQuery)
+  let queryResp = await connection.query(insertQuery,(err,res)=>{
+    if(err){
+      console.log("Error While Inserting in rentDb",err)
+    }
+    else{
+      console.log("RentDB entry DOne successfully")
+    }
+
+  })
+  console.log("dekh kya mila",queryResp)
+}
+
+
+
+
+  //   let itemspromise =  await connection.query(checkInventor,(dberr,dbresp)=>{if(dberr==null){
+  //         dbresp.forEach(element => {
+  //           console.log("elements",element) 
+  //         });
+
+  //         if(dbresp.length==0){
+  //           console.log("nhi mila data")
+  //           return resolve("There is no data")
+  //         }
+  //         else{
+  //           console.log("mil gya he data",dbresp)
+  //           return resolve(dbresp)
+  //         }
+  //       }
+  //     });
+  //   });
+  //   itemspromise.then((dbresp)=>{
+  //     req.datagot = dbresp;
+  //   })
+  //   itemspromise.catch((dberr)=>{
+  //     req.datagot = dberr;
+  //   })
+  //   itemspromise.finally(()=>{
+  //     req.datagot = dbresp
+  //     next(req.datagot);
+  //   });
+  // };
 
 
 
@@ -110,5 +196,7 @@ function checkItemAvaliabitlty(req,res,next){
 
 module.exports={
     upsertInventory,
-    checkItemAvaliabitlty
+    itemInInventory,
+    upsertInventoryByName,
+    insertIntoRentDb
 }

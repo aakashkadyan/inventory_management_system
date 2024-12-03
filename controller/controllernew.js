@@ -1,5 +1,6 @@
 
-const {upsertInventory, checkItemAvaliabitlty} = require("../services/invetory.services")
+const {upsertInventory, itemInInventory,upsertInventoryByName,insertIntoRentDb} = require("../services/invetory.services")
+
 
 const path = require("path");
 const templatePath = path.join(__dirname,"..")+"/templates"
@@ -118,51 +119,130 @@ function upsertInventoryProduct(req,res,next){
 
 // RENT WALA DATA
 
-function rentingObject(req,res,next){
-  let data = req.body
-  // console.log("heyyyyyyyylogggg",req.body);
-  console.log("itemnameeeeeee",data.item_name);
-  let checkPromise = new Promise((resolve,reject)=>{
-    let checkDbQuery = `SELECT * FROM inventory WHERE DeviceName = "${data.item_name}";`
-    connection.query(checkDbQuery,(dberr,dbresp)=>{
-      if(dberr){
-        console.log("thingssss",dberr)
-        return reject(`didn't able to find from inventory table ${dberr}`)
-      }
-      else{
-        console.log("dbrespdbresp",dbresp)
-        return resolve(`got the data from inventory table ${dbresp}`)
-      }
-    })
-  })
-  checkPromise.then((dbresp)=>{
-    console.log("quantity in db",dbresp[0].Quantity)
-    console.log("form in quantity",parseInt(data.quantity))
-    if(parseInt(data.quantity)<=dbresp[0].Quantity){
-      let updatedInventoryQuantity = dbresp[0].Quantity-parseInt(data.quantity)
-      console.log("DB Data is more than require data",dbresp[0].Quantity-parseInt(data.quantity))
-      let date = new Date().toISOString().split('T')[0]
+// function rentingObject(req,res,next){
+//   let data = req.body
+//   console.log("itemnameeeeeee",data.item_name);
+//   let checkPromise = new Promise((resolve,reject)=>{
+//     let checkDbQuery = `SELECT * FROM inventory WHERE DeviceName = "${data.item_name}";`
+//     connection.query(checkDbQuery,(dberr,dbresp)=>{
+//       if(dberr){
+//         console.log("thingssss",dberr)
+//         return reject(`didn't able to find from inventory table ${dberr}`)
+//       }
+//       else{
+//         console.log("dbrespdbresp",dbresp)
+//         return resolve(`got the data from inventory table ${dbresp}`)
+//       }
+//     })
+//   })
+//   checkPromise.then((dbresp)=>{
+//     console.log("quantity in db",dbresp[0].Quantity)
+//     console.log("form in quantity",parseInt(data.quantity))
+//     if(parseInt(data.quantity)<=dbresp[0].Quantity){
+//       let updatedInventoryQuantity = dbresp[0].Quantity-parseInt(data.quantity)
+//       console.log("DB Data is more than require data",dbresp[0].Quantity-parseInt(data.quantity))
+//       let date = new Date().toISOString().split('T')[0]
 
-      let rentEntryQuery = `INSERT INTO rent(RentedDate, ReturnDate, object_Id ,TotalCharges ,RenterEmail ,RenterName ,Quantity ,status ) VALUES('${date}, ',)`
-    }
-    else{
-      console.log("Insufficient Data")
+//       let rentEntryQuery = `INSERT INTO rent(RentedDate, ReturnDate, object_Id ,TotalCharges ,RenterEmail ,RenterName ,Quantity ,status ) VALUES('${date}, ',)`
+//     }
+//     else{
+//       console.log("Insufficient Data")
       
-    }
-  })
-  checkPromise.catch((dberr)=>{
-    console.log("No such iteam in our db",dberr)
-  })
-  next()
-}
+//     }
+//   })
+//   checkPromise.catch((dberr)=>{
+//     console.log("No such iteam in our db",dberr)
+//   })
+//   next()
+// }
 
 
 async function inventoryItemCheck(req,res,next){
-  console.log("CONTROLLERRRRR")
-  let checkAvailable = await checkItemAvaliabitlty(req,res,next)
-  console.log("dbbbbbb",req.datagot)
-  next()
-};
+  try{
+    console.log("CONTROLLERRRRR",req.body.status)
+    const elements =await itemInInventory()
+    res.newfinalData = elements;
+    // res.send(elements)
+    // console.log("Dattaaa",elements)
+    // res.send(elements)
+    next()
+
+  }catch(error){
+    console.error("Error While fatching inventory")
+  } 
+}
+
+
+
+async function rentingObject(req,res,next){
+  console.log("heyyyyyyyyyyyyyyyyyyyy",req.body)
+  let data = req.body
+  let itemName = req.body.item_name
+  let requestedQuantity = data.quantity
+  let Quantity = data.Quantity
+  let rentStartDate = data['start-date']
+  let renterName = data['renter-name']
+  let renterEmail = data['renter-email']
+  let rentingTimePeriod = data['rental-duration']
+  console.log("itemNameitemName",itemName)
+  console.log("dataaaa",data.item_name)
+  console.log("Quantity",Quantity)
+  console.log("price",data.price)
+  console.log("requestedQuantity",requestedQuantity)
+  console.log("rental-duration",data["rental-duration"])
+
+  // const {itemName,Quantity,price,rentDuration,requestedQuantity,startDate,renterName,renterContact,renterEmail} = req.body
+  if (Number(requestedQuantity) > Number(Quantity)) {
+    return res.status(400).json({
+      status: "error",
+      message: "Insufficient quantity available"
+    });
+  }
+
+  try {
+
+    let upsertOutPut = await upsertInventoryByName(itemName, requestedQuantity);
+    console.log("dataaa milaa he kya", upsertOutPut);
+    let rentedId = upsertOutPut.objectId
+    let totalBill = data.price*data['rental-duration']
+    let insertDataInRentDb = await insertIntoRentDb(rentStartDate,rentedId,totalBill,renterEmail,renterName,requestedQuantity)
+
+    // Send response back to client after inventory update
+    res.status(200).json({
+      status: "success",
+      message: "Rental request successfully processed",
+      GrandTotal_Bill : totalBill
+    });
+  } catch (err) {
+      console.log("Error while updating inventory:", err);
+      res.status(500).json({
+      status: "error",
+      message: "An error occurred while processing the rental request"
+    });
+  }
+}
+  // }else{
+  //   console.log("yhaaa mila kuchchh")
+  //   updatingQuantity = requestedQuantity
+  //   console.log("yhaa name he",itemName)
+  //   let upsertOutPut = await upsertInventoryByName(itemName,updatingQuantity)
+  //   console.log("dataaa milaa he kya",upsertOutPut)
+
+    // let findByNameQuery = async function ({itemName}){
+    //   console.log("idhar naam dekh",itemName)
+    //   const result = await connection.promise().query(`SELECT * FROM inventory WHERE DeviceName = "${itemName}"`);
+    //   console.log("Resultttt",result)
+    // console.log("findanameeee",findByNameQuery)
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -173,4 +253,5 @@ async function inventoryItemCheck(req,res,next){
     returnPage, overviewPage,
     contactPage, customerPage,
     upsertInventoryProduct,
+    rentingObject
   }
