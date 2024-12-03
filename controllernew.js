@@ -236,30 +236,60 @@ function checkAndInsertData(req,res,next){
 
 function rentingObject(req,res,next){
   let data = req.body
-  // console.log("heyyyyyyyylogggg",req.body);
-  console.log("itemnameeeeeee",data.item_name);
+  console.log("heyyyyyyyylogggg",req.body);
+  console.log("itemnameeeeeee",data['item-name']);
   let checkPromise = new Promise((resolve,reject)=>{
-    let checkDbQuery = `SELECT * FROM inventory WHERE DeviceName = "${data.item_name}";`
+    let checkDbQuery = `SELECT * FROM inventory WHERE DeviceName = "${data['item-name']}";`
     connection.query(checkDbQuery,(dberr,dbresp)=>{
+      console.log("dberrrrrr22",dberr)
+      console.log("dbresp",dbresp)
       if(dberr){
-        console.log("thingssss",dberr)
-        return reject(`didn't able to find from inventory table ${dberr}`)
+        console.log(`didn't able to find from inventory table`,dberr)
+        return reject(dberr)
       }
       else{
-        console.log("dbrespdbresp",dbresp)
-        return resolve(`got the data from inventory table ${dbresp}`)
+        console.log(`got the data from inventory table`,dbresp)
+        return resolve(dbresp)
       }
     })
   })
   checkPromise.then((dbresp)=>{
-    console.log("quantity in db",dbresp[0].Quantity)
+    console.log("quantity in dbb",dbresp[0].PricePerDay)
     console.log("form in quantity",parseInt(data.quantity))
     if(parseInt(data.quantity)<=dbresp[0].Quantity){
       let updatedInventoryQuantity = dbresp[0].Quantity-parseInt(data.quantity)
       console.log("DB Data is more than require data",dbresp[0].Quantity-parseInt(data.quantity))
-      let date = new Date().toISOString().split('T')[0]
+      // let date = new Date().toISOString().split('T')[0]
+      console.log("dbresp[0].PricePerDay ",dbresp[0].PricePerDay)
+      console.log("data['rental-duration']",data['rental-duration'])
+      let TotalCharges = dbresp[0].PricePerDay*data['rental-duration']
+      console.log("TOTAL CHARGEsssssS",TotalCharges)
+      if(dbresp[0].Quantity-parseInt(data.quantity)>0){
+        let values = [
+          data['start-date'], 
+          dbresp[0].object_Id, 
+          TotalCharges, 
+          data['renter-email'], 
+          data['renter-name'], 
+          data.quantity, 
+          'active'
+      ];
+        let rentItemPromise = new Promise((resolve,reject)=>{
+          let rentEntryQuery = `INSERT INTO rent (RentedDate, object_Id, TotalCharges, RenterEmail, RenterName, Quantity, status) VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
-      let rentEntryQuery = `INSERT INTO rent(RentedDate, ReturnDate, object_Id ,TotalCharges ,RenterEmail ,RenterName ,Quantity ,status ) VALUES('${date}, ',)`
+          connection.query(rentEntryQuery,values,(dberr,dbresp)=>{
+            if(dberr){
+              return reject(dberr)
+            }
+            else{
+              return resolve(dbresp)
+            }
+          })
+        })
+      rentItemPromise.then((dbresp)=>{
+        console.log("rent data inserted in the database",dbresp)
+      })
+      }
     }
     else{
       console.log("Insufficient Data")
