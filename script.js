@@ -60,6 +60,7 @@ const newpath = __dirname+"/templates/"
 console.log("newwwwwww",newpath)
 app.use(express.static('static'));
 
+// app.get("/",DataBaseHandler,(req,res)=>{
 app.get("/",(req,res)=>{
   res.sendFile(path.join(newpath,"index.html"))
 })
@@ -82,25 +83,21 @@ app.get("/rent",(req,res)=>{
 app.get("/return",(req,res)=>{
   console.log("heyyy11111")
   res.sendFile(path.join(newpath,"return.html"))
-  res.sendFile(path.join(newpath,"return.html"))
 
 })
 
 
 app.get("/overview",(req,res)=>{
   res.sendFile(path.join(newpath,"overview.html"))
-  res.sendFile(path.join(newpath,"overview.html"))
 })
 
 
 app.get("/contact",(req,res)=>{
   res.sendFile(path.join(newpath,"contact.html"))
-  res.sendFile(path.join(newpath,"contact.html"))
 
 })
 
 app.get("/customers",(req,res)=>{
-  res.sendFile(path.join(newpath,"customer.html"))
   res.sendFile(path.join(newpath,"customer.html"))
 
 

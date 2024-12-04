@@ -22,7 +22,7 @@
         <!-- Item Selection -->
         <div class="form-group">
             <label for="item-name">Select Item:</label>
-            <select id="item-name" name="item-name" required onchange="showingPriceAndTotalQuantity()"></select>
+            <select id="item-name" name="item_name" required onchange="showingPriceAndTotalQuantity()"></select>
         </div>
         <!-- Rental Duration -->
 
@@ -43,11 +43,10 @@
         <!-- Item's Quantity -->
         <div class="form-group">
             <label for="quantity">Item's Quantity:</label>
-            <input type="number" id="quantity" name="quantity" min="1" required>
+            <input type="number" id="quantity" name="quantity" min="1" required oninput="requireItemQuantityCheck()">
         </div>
        
-        
-
+    
         <!-- Start Date -->
         <div class="form-group">
             <label for="start-date">Start Date:</label>
@@ -89,25 +88,27 @@
 </div>
 </body>
 <script>
-    fetch('/rent_data', {
+    fetch('/inventoryItemForRent', {
                 method: 'POST',
                 headers: {
                 'Content-Type': 'application/json'
                 },
-                body : JSON.stringify({ name : "dekh to le" })  
+                body : JSON.stringify({ status : "start" })  
             })
             .then(response=>response.json())
             .then(resultdata=>{
+                console.log("resulttt",resultdata)
                 let element = document.getElementById("item-name")
-                for(let i=0;i<resultdata.length;i++){
+                console.log("element",element)
+                for(let i=0;i<resultdata['prices'].length;i++){
                     let optionElement = document.createElement("OPTION")
-                    console.log("data",resultdata[i])
-                    optionElement.setAttribute("value",resultdata[i].DeviceName)
-                    optionElement.setAttribute("data-price",resultdata[i].PricePerDay)
-                    optionElement.setAttribute("Quantity",resultdata[i].Quantity)
+                    console.log("dataaaaa",resultdata['prices'][i])
+                    optionElement.setAttribute("value",resultdata['deviceName'][i])
+                    optionElement.setAttribute("data-price",resultdata['prices'][i])
+                    optionElement.setAttribute("Quantity",resultdata['totalQuantity'][i])
                     // optionElement.setAttribute("selected","")
                     // optionElement.setAttribute("selected","")
-                    optionElement.innerHTML = resultdata[i].DeviceName
+                    optionElement.innerHTML = resultdata['deviceName'][i]
                     
                     console.log("html side pr",optionElement)
                     // element.innerHTML = resultdata[i];
@@ -128,6 +129,19 @@
         // console.log("getItem",getItem[getItem.selectedIndex].getAttribute('data-price'))
         DisplayBox.value = getItem[getItem.selectedIndex].getAttribute('data-price')
         QuantityBox.value = getItem[getItem.selectedIndex].getAttribute('Quantity')       
+    }
+    
+    function requireItemQuantityCheck(){
+        let demandedQuantity = document.getElementById("quantity").value
+        let totalItemInDb = document.getElementById("TotalQuantity").value
+        if(Number(totalItemInDb)<Number(demandedQuantity)){
+            alert("Insuffecient Device In DB")
+            console.log("insuffecient data",demandedQuantity)
+        }
+        else{
+            console.log("This is ok")
+        }
+
     }
     // window.onload = showingPrice;
 </script>
