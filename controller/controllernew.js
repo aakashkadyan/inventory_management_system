@@ -1,5 +1,5 @@
 
-const {upsertInventory, itemInInventory,upsertInventoryByName,insertIntoRentDb} = require("../services/invetory.services")
+const {upsertInventory, itemInInventory,upsertInventoryByName,insertIntoRentDb,rentedDataByEmail,deviceNameWithObjectId} = require("../services/invetory.services")
 
 
 const path = require("path");
@@ -234,11 +234,31 @@ async function rentingObject(req,res,next){
     //   console.log("Resultttt",result)
     // console.log("findanameeee",findByNameQuery)
 
+async function getRentedDataByEmail(req,res,next){
+  let renterEmail = req.body['renter-email']
+  console.log("renter Email",renterEmail )
+  req.rentedDataForEmail = await rentedDataByEmail(renterEmail)
+  console.log(" req.rentedDataForEmail",req.rentedDataForEmail)
+  next()
+}
 
 
-
-
-
+async function getItemNameFromItemId(req,res,next){
+  let rentedData = req.rentedDataForEmail
+  console.log("Renter",rentedData)
+  const objectIds = rentedData.map(item=>item.object_Id)
+  const renterEmail = rentedData[0]['RenterEmail']
+  let itemsWithDeviceNameAndId = await deviceNameWithObjectId(objectIds,renterEmail)
+  console.log("itemsWithDeviceNameAndId",itemsWithDeviceNameAndId)
+  itemsWithDeviceNameAndId.forEach(element => {
+    // console.log("element['RentedDate']",typeof(element['RentedDate']))
+    // console.log("element['RentedDate']",new Date(element['RentedDate']).toISOString().split("T")[0])
+    element['RentedDate'] = new Date(element['RentedDate']).toISOString().split("T")[0]
+    
+  });
+  req.itemsWithDeviceNameAndId = itemsWithDeviceNameAndId
+  next()
+}
 
 
 
@@ -253,5 +273,7 @@ async function rentingObject(req,res,next){
     returnPage, overviewPage,
     contactPage, customerPage,
     upsertInventoryProduct,
-    rentingObject
+    rentingObject,
+    getRentedDataByEmail,
+    getItemNameFromItemId
   }

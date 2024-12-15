@@ -97,7 +97,7 @@ function checkAndInsertData(req,res,next){
     console.log("errrrr",myerr)
     let insertPromise = new Promise((resolve,reject)=>{
       console.log("heyyyyyy")
-      let insertQuery = `INSERT INTO inventory(DeviceName, Quantity, PricePerDay) VALUES('${data.name}','${data.quantity}','${data.price}');`
+      let insertQuery = `INSERT INTO inventory(DeviceName, InventoryQuantity, PricePerDay) VALUES('${data.name}','${data.quantity}','${data.price}');`
       connection.query(insertQuery,(dberr,dbresp)=>{
         console.log("yee ayya",dberr)
         console.log("yee ayya dbrespdbresp",dbresp)
@@ -259,7 +259,7 @@ function rentingObject(req,res,next){
       console.log("DB Data is more than require data",dbresp[0].Quantity-parseInt(data.quantity))
       let date = new Date().toISOString().split('T')[0]
 
-      let rentEntryQuery = `INSERT INTO rent(RentedDate, ReturnDate, object_Id ,TotalCharges ,RenterEmail ,RenterName ,Quantity ,status ) VALUES('${date}, ',)`
+      let rentEntryQuery = `INSERT INTO rent(RentedDate, ReturnDate, object_Id ,TotalCharges ,RenterEmail ,RenterName ,RentedQuantity ,status ) VALUES('${date}, ',)`
     }
     else{
       console.log("Insufficient Data")

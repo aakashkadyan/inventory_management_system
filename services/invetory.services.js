@@ -37,7 +37,7 @@ function upsertInventory(req,res,next){
         })
       searchDataPromise.catch((myerr)=>{
       let insertPromise = new Promise((resolve,reject)=>{
-        let insertQuery = `INSERT INTO inventory(DeviceName, Quantity, PricePerDay) VALUES('${name}','${quantity}','${price}');`
+        let insertQuery = `INSERT INTO inventory(DeviceName, InventoryQuantity, PricePerDay) VALUES('${name}','${quantity}','${price}');`
         connection.query(insertQuery,(dberr,dbresp)=>{
           console.log("yee ayya",dberr)
           console.log("yee ayya dbrespdbresp",dbresp)
@@ -73,10 +73,11 @@ function itemInInventory(){
     return new Promise((resolve,reject)=>{
       connection.query(everyThingFromInventory,(dberr,dbresp)=>{
         if(!dberr){
+          console.log("deekh idhar response",dbresp)
           dbresp.forEach(element => {
             deviceName.push(element.DeviceName)
             prices.push(element.PricePerDay)
-            totalquantity.push(element.Quantity)
+            totalquantity.push(element.InventoryQuantity)
           });
         }
         else{
@@ -110,10 +111,10 @@ async function upsertInventoryByName(itemName,requestedQuantity){
     try {
       let dbresp = await inventoryDataWithName(itemName)
       console.log("YEEE DEKHHH",dbresp)
-      console.log("inventoryMe ye data mila he", dbresp[0].Quantity);
-      let updatedInventoryQuantity = Number(dbresp[0].Quantity)-Number(requestedQuantity)
-      console.log("updatedInventoryQuantityupdatedInventoryQuantity",updatedInventoryQuantity)
-      let insertUpdatedQuantity = `UPDATE inventory SET Quantity = ${updatedInventoryQuantity} WHERE DeviceName = "${itemName}"; `
+      console.log("inventoryMe ye data mila he", dbresp[0].InventoryQuantity);
+      let updatedInventoryQuantity = Number(dbresp[0].InventoryQuantity)-Number(requestedQuantity)
+      // console.log("updatedInventoryQuantityupdatedInventoryQuantity",updatedInventoryQuantity)
+      let insertUpdatedQuantity = `UPDATE inventory SET InventoryQuantity = ${updatedInventoryQuantity} WHERE DeviceName = "${itemName}"; `
       let upsertStatus = await new Promise((resolve,reject)=>{
         connection.query(insertUpdatedQuantity,(dberr,dbres)=>{
           if (dberr){
@@ -143,7 +144,7 @@ async function upsertInventoryByName(itemName,requestedQuantity){
 
 
 async function insertIntoRentDb(rentStartDate,rentedId,totalBill,renterEmail,renterName,requestedQuantity,status="Active"){
-  let insertQuery = `INSERT INTO rent(RentedDate,object_Id,TotalCharges,RenterEmail,RenterName,Quantity,status) VALUES("${rentStartDate}",${rentedId},${totalBill},"${renterEmail}","${renterName}",${requestedQuantity},"${status}");`
+  let insertQuery = `INSERT INTO rent(RentedDate,object_Id,TotalCharges,RenterEmail,RenterName,RentedQuantity,status) VALUES("${rentStartDate}",${rentedId},${totalBill},"${renterEmail}","${renterName}",${requestedQuantity},"${status}");`
   console.log("Insert Query for rent db",insertQuery)
   let queryResp = await connection.query(insertQuery,(err,res)=>{
     if(err){
@@ -188,7 +189,44 @@ async function insertIntoRentDb(rentStartDate,rentedId,totalBill,renterEmail,ren
   //   });
   // };
 
+async function rentedDataByEmail(renterEmail){
+  let searchQuary = `SELECT * FROM rent WHERE RenterEmail = "${renterEmail}"`
+  console.log("searchQuary",searchQuary)
+  let data =  await new Promise((resolve,reject) => { 
+    connection.query(searchQuary,(dberr,dbresp) =>{
+    if (dberr){
+      console.log("There is a problem",dberr)
+      reject(dberr)
+      }
+    else{
+      console.log("dbresssss",dbresp)
+      resolve(dbresp)
+      }
+   })
+  })
+  console.log("dataaaaa",data)
+  return data
+}
 
+async function deviceNameWithObjectId(objectIds,renterEmail){
+  console.log("OBJECT IDS",objectIds)
+  console.log("OBJECT IDS renterEmail",renterEmail)
+  // let NameByObjectId = `SELECT inventory.object_Id,DeviceName,RentedQuantity,RenterEmail,TotalCharges,RentedDate,status FROM inventory,rent WHERE inventory.object_Id IN (${objectIds});`
+  let NameByObjectId = `SELECT rent.object_Id,DeviceName,RentedQuantity,RenterEmail,TotalCharges,RentedDate,status FROM rent INNER JOIN inventory ON rent.object_Id = inventory.object_Id WHERE rent.object_Id IN (${objectIds}) AND rent.RenterEmail="${renterEmail}";`
+  let rentedDataWithDeviceName = await new Promise((resolve,reject)=>{
+    connection.query(NameByObjectId,(dberr,dbresp)=>{
+      if(dberr){
+        console.log("this is error of db",dberr)
+        reject(dberr)
+      }
+      else{
+        console.log("dbresponse is this",dbresp)
+        resolve(dbresp)
+      }
+    })
+  })
+  return rentedDataWithDeviceName
+}
 
 
 
@@ -198,5 +236,7 @@ module.exports={
     upsertInventory,
     itemInInventory,
     upsertInventoryByName,
-    insertIntoRentDb
+    insertIntoRentDb,
+    rentedDataByEmail,
+    deviceNameWithObjectId
 }

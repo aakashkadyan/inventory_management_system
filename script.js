@@ -1,10 +1,20 @@
 const express = require('express');
 const path = require("path");
 const mysql = require('mysql');
-const  {inventoryItemCheck,rentingObject} = require("./controller/controllernew.js")
+const  {inventoryItemCheck,rentingObject,getRentedDataByEmail,getItemNameFromItemId} = require("./controller/controllernew.js")
 const {initDb,upsertData} = require("./lib/db.js")
 const app = express();
 const bodyParser = require('body-parser');
+const hbs = require('hbs');
+hbs.registerHelper('json', function(context) {
+  return JSON.stringify(context);  // Convert object to JSON string
+});
+
+
+
+app.set('view engine', 'hbs');
+app.set(__dirname+"/")
+
 
 app.use(bodyParser.json());
 
@@ -15,7 +25,7 @@ initDb()
 
 // connection.connect()
 
-
+console.log("Directory,",__dirname)
 
 
 
@@ -81,10 +91,13 @@ app.get("/rent",(req,res)=>{
 
 
 app.get("/return",(req,res)=>{
-  console.log("heyyy11111")
+  console.log("heyyy11111",)
   res.sendFile(path.join(newpath,"return.html"))
 
 })
+
+
+
 
 
 app.get("/overview",(req,res)=>{
@@ -129,6 +142,20 @@ app.post("/inventoryItemForRent",inventoryItemCheck,(req,res)=>{
 })
 
 
+
+app.post("/returnItem",getRentedDataByEmail,getItemNameFromItemId,(req,res)=>{
+  console.log("after all rented data",req.rentedDataForEmail)
+  console.log("after all req.itemsWithDeviceNameAndId",req.itemsWithDeviceNameAndId)
+  let finaldata = req.itemsWithDeviceNameAndId
+  // res.sendFile(path.join(newpath,"rentedData.html"))
+  // console.log("PATHSSS",path.join(newpath,"rentedData.html"))
+  console.log("finaldata",finaldata)
+  // res.sendFile(path.join(newpath,"rentedData.html"),finaldata)
+  res.render("rentedData",{finaldata});
+})
+
+
 app.listen(3000, () => {
   console.log('Server started on http://localhost:3000');
 });
+

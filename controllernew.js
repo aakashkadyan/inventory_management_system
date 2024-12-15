@@ -97,7 +97,7 @@ function checkAndInsertData(req,res,next){
     console.log("errrrr",myerr)
     let insertPromise = new Promise((resolve,reject)=>{
       console.log("heyyyyyy")
-      let insertQuery = `INSERT INTO inventory(DeviceName, Quantity, PricePerDay) VALUES('${data.name}','${data.quantity}','${data.price}');`
+      let insertQuery = `INSERT INTO inventory(DeviceName, InventoryQuantity, PricePerDay) VALUES('${data.name}','${data.quantity}','${data.price}');`
       connection.query(insertQuery,(dberr,dbresp)=>{
         console.log("yee ayya",dberr)
         console.log("yee ayya dbrespdbresp",dbresp)
